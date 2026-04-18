@@ -295,7 +295,7 @@ function WhyUs() {
                         const Icon = item.icon;
                         return (
                             <div
-                                key={i}
+                                key={item.title}
                                 className="card-hr p-6 flex flex-col gap-3 group"
                                 data-testid={`why-card-${i}`}
                             >
@@ -417,7 +417,7 @@ function Gallery() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {GALLERY.map((src, i) => (
                         <div
-                            key={i}
+                            key={src}
                             className={`relative overflow-hidden border border-white/10 group ${
                                 i === 0 || i === 3 ? "md:row-span-2 aspect-[3/4]" : "aspect-square"
                             }`}
@@ -450,10 +450,10 @@ function Testimonials() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {TESTIMONIALS.map((t, i) => (
-                    <div key={i} className="card-hr p-8 flex flex-col gap-5" data-testid={`testimonial-${i}`}>
+                    <div key={t.name} className="card-hr p-8 flex flex-col gap-5" data-testid={`testimonial-${i}`}>
                         <div className="flex gap-0.5">
-                            {Array.from({ length: t.rating }).map((_, s) => (
-                                <Star key={s} size={14} className="text-primary fill-primary" />
+                            {Array.from({ length: t.rating }, (_, s) => `${t.name}-star-${s}`).map((starKey) => (
+                                <Star key={starKey} size={14} className="text-primary fill-primary" />
                             ))}
                         </div>
                         <p className="text-white/90 leading-relaxed">"{t.quote}"</p>

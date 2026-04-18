@@ -102,6 +102,21 @@
     .card-hr {
         @apply bg-card border border-border transition-all hover:border-primary/60 hover:-translate-y-0.5;
     }
+    .form-input {
+        width: 100%;
+        background: hsl(0 0% 7%);
+        border: 1px solid hsl(0 0% 15%);
+        padding: 0.75rem 1rem;
+        color: white;
+        font-size: 0.875rem;
+        outline: none;
+        transition: all 0.2s;
+    }
+    .form-input:focus {
+        border-color: hsl(357 93% 47%);
+        box-shadow: 0 0 0 3px hsl(357 93% 47% / 0.15);
+    }
+    .form-input::placeholder { color: hsl(0 0% 40%); }
     .divider-dashed {
         background-image: repeating-linear-gradient(
             to right,

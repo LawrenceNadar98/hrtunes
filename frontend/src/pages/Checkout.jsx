@@ -1,12 +1,19 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { ArrowLeft, Lock, CheckCircle2, CreditCard, Shield } from "lucide-react";
 import { PRICING } from "@/lib/mock";
 import { toast } from "sonner";
 
+const PAYMENT_METHODS = [
+    { id: "card", label: "Card" },
+    { id: "upi", label: "UPI" },
+    { id: "netbanking", label: "Net Banking" },
+];
+
 export default function Checkout() {
     const navigate = useNavigate();
-    const [selected, setSelected] = useState(PRICING[1]);
+    const paidPlans = useMemo(() => PRICING.filter((p) => p.price > 0), []);
+    const [selected, setSelected] = useState(paidPlans[0]);
     const [method, setMethod] = useState("card");
     const [processing, setProcessing] = useState(false);
 
@@ -46,7 +53,7 @@ export default function Checkout() {
                             <div className="eyebrow mb-3">Step 01</div>
                             <h2 className="text-display text-4xl mb-6">Choose your plan.</h2>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                {PRICING.filter((p) => p.price > 0).map((p) => (
+                                {paidPlans.map((p) => (
                                     <button
                                         key={p.id}
                                         type="button"
@@ -73,11 +80,7 @@ export default function Checkout() {
                             <div className="eyebrow mb-3">Step 02</div>
                             <h2 className="text-display text-4xl mb-6">Payment method.</h2>
                             <div className="flex gap-2 mb-6">
-                                {[
-                                    { id: "card", label: "Card" },
-                                    { id: "upi", label: "UPI" },
-                                    { id: "netbanking", label: "Net Banking" },
-                                ].map((m) => (
+                                {PAYMENT_METHODS.map((m) => (
                                     <button
                                         key={m.id}
                                         type="button"
@@ -97,17 +100,17 @@ export default function Checkout() {
                             {method === "card" && (
                                 <div className="space-y-5">
                                     <Field label="Cardholder name">
-                                        <input required type="text" placeholder="Harsh Rajput" className="checkout-input" data-testid="card-name" />
+                                        <input required type="text" placeholder="Harsh Rajput" className="form-input" data-testid="card-name" />
                                     </Field>
                                     <Field label="Card number">
                                         <div className="relative">
-                                            <input required type="text" placeholder="1234 5678 9012 3456" className="checkout-input pr-10" data-testid="card-number" />
+                                            <input required type="text" placeholder="1234 5678 9012 3456" className="form-input pr-10" data-testid="card-number" />
                                             <CreditCard size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                                         </div>
                                     </Field>
                                     <div className="grid grid-cols-2 gap-5">
-                                        <Field label="Expiry"><input required type="text" placeholder="MM/YY" className="checkout-input" data-testid="card-expiry" /></Field>
-                                        <Field label="CVV"><input required type="text" placeholder="•••" className="checkout-input" data-testid="card-cvv" /></Field>
+                                        <Field label="Expiry"><input required type="text" placeholder="MM/YY" className="form-input" data-testid="card-expiry" /></Field>
+                                        <Field label="CVV"><input required type="text" placeholder="•••" className="form-input" data-testid="card-cvv" /></Field>
                                     </div>
                                 </div>
                             )}
@@ -115,14 +118,14 @@ export default function Checkout() {
                             {method === "upi" && (
                                 <div>
                                     <Field label="UPI ID">
-                                        <input required type="text" placeholder="you@hdfc" className="checkout-input" data-testid="upi-id" />
+                                        <input required type="text" placeholder="you@hdfc" className="form-input" data-testid="upi-id" />
                                     </Field>
                                 </div>
                             )}
 
                             {method === "netbanking" && (
                                 <Field label="Select bank">
-                                    <select className="checkout-input">
+                                    <select className="form-input">
                                         <option className="bg-card">HDFC Bank</option>
                                         <option className="bg-card">ICICI Bank</option>
                                         <option className="bg-card">Axis Bank</option>
@@ -136,10 +139,10 @@ export default function Checkout() {
                             <div className="eyebrow mb-3">Step 03</div>
                             <h2 className="text-display text-4xl mb-6">Billing contact.</h2>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                                <Field label="Full name"><input required type="text" placeholder="Harsh Rajput" className="checkout-input" data-testid="billing-name" /></Field>
-                                <Field label="Email"><input required type="email" placeholder="you@hrtunes.in" className="checkout-input" data-testid="billing-email" /></Field>
+                                <Field label="Full name"><input required type="text" placeholder="Harsh Rajput" className="form-input" data-testid="billing-name" /></Field>
+                                <Field label="Email"><input required type="email" placeholder="you@hrtunes.in" className="form-input" data-testid="billing-email" /></Field>
                                 <div className="sm:col-span-2">
-                                    <Field label="Billing address"><input required type="text" placeholder="Street, city, state" className="checkout-input" /></Field>
+                                    <Field label="Billing address"><input required type="text" placeholder="Street, city, state" className="form-input" /></Field>
                                 </div>
                             </div>
                         </section>
@@ -199,23 +202,6 @@ export default function Checkout() {
                     </aside>
                 </div>
             </div>
-            <style>{`
-                .checkout-input {
-                    width: 100%;
-                    background: hsl(0 0% 7%);
-                    border: 1px solid hsl(0 0% 15%);
-                    padding: 0.75rem 1rem;
-                    color: white;
-                    font-size: 0.875rem;
-                    outline: none;
-                    transition: all 0.2s;
-                }
-                .checkout-input:focus {
-                    border-color: hsl(357 93% 47%);
-                    box-shadow: 0 0 0 3px hsl(357 93% 47% / 0.15);
-                }
-                .checkout-input::placeholder { color: hsl(0 0% 40%); }
-            `}</style>
         </div>
     );
 }

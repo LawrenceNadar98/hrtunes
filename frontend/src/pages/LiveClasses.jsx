@@ -77,9 +77,10 @@ export default function LiveClasses() {
                         {cells.map((d, i) => {
                             const hasClass = d && daysWithClasses.has(d);
                             const isSelected = d === selectedDay;
+                            const cellKey = d ? `day-${d}` : `blank-${i}`;
                             return (
                                 <button
-                                    key={i}
+                                    key={cellKey}
                                     disabled={!d}
                                     onClick={() => d && setSelectedDay(d)}
                                     className={`aspect-square flex flex-col items-center justify-center text-sm font-medium border transition-all ${

@@ -317,6 +317,7 @@ function UploadsAdmin() {
         e.preventDefault();
         setDragOver(false);
         const newFiles = Array.from(e.dataTransfer.files).map((f) => ({
+            id: `${f.name}-${f.size}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
             name: f.name,
             size: (f.size / 1024).toFixed(1) + " KB",
             type: f.type || "unknown",
@@ -327,6 +328,7 @@ function UploadsAdmin() {
 
     const onSelect = (e) => {
         const newFiles = Array.from(e.target.files).map((f) => ({
+            id: `${f.name}-${f.size}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
             name: f.name,
             size: (f.size / 1024).toFixed(1) + " KB",
             type: f.type || "unknown",
@@ -334,7 +336,7 @@ function UploadsAdmin() {
         setFiles([...files, ...newFiles]);
     };
 
-    const remove = (i) => setFiles(files.filter((_, idx) => idx !== i));
+    const remove = (id) => setFiles(files.filter((f) => f.id !== id));
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" data-testid="admin-uploads">
@@ -365,8 +367,8 @@ function UploadsAdmin() {
                     <div className="mt-6 card-hr p-6">
                         <div className="eyebrow mb-4">Queue ({files.length})</div>
                         <ul className="space-y-2">
-                            {files.map((f, i) => (
-                                <li key={i} className="flex items-center gap-3 p-3 border border-white/10 hover:border-primary/40 transition-colors">
+                            {files.map((f) => (
+                                <li key={f.id} className="flex items-center gap-3 p-3 border border-white/10 hover:border-primary/40 transition-colors">
                                     <div className="w-8 h-8 bg-primary/10 border border-primary/30 flex items-center justify-center">
                                         <Music2 size={13} className="text-primary" />
                                     </div>
@@ -374,7 +376,7 @@ function UploadsAdmin() {
                                         <div className="text-sm font-medium truncate">{f.name}</div>
                                         <div className="text-xs text-muted-foreground">{f.size}</div>
                                     </div>
-                                    <button onClick={() => remove(i)} className="text-muted-foreground hover:text-primary p-1">
+                                    <button onClick={() => remove(f.id)} className="text-muted-foreground hover:text-primary p-1">
                                         <X size={14} />
                                     </button>
                                 </li>

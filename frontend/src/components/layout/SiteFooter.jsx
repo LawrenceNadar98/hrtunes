@@ -2,6 +2,13 @@ import { Instagram, Facebook, Youtube, Linkedin, Mail, MapPin, Phone } from "luc
 import { BRAND } from "@/lib/mock";
 import { Link } from "react-router-dom";
 
+const SOCIAL_LINKS = [
+    { Icon: Instagram, label: "Instagram" },
+    { Icon: Facebook, label: "Facebook" },
+    { Icon: Youtube, label: "Youtube" },
+    { Icon: Linkedin, label: "Linkedin" },
+];
+
 export default function SiteFooter() {
     return (
         <footer className="bg-black border-t border-white/10 mt-24" data-testid="site-footer">
@@ -15,10 +22,11 @@ export default function SiteFooter() {
                         {BRAND.description}
                     </p>
                     <div className="mt-6 flex items-center gap-3">
-                        {[Instagram, Facebook, Youtube, Linkedin].map((Icon, i) => (
+                        {SOCIAL_LINKS.map(({ Icon, label }, i) => (
                             <a
-                                key={i}
+                                key={label}
                                 href="#"
+                                aria-label={label}
                                 className="w-9 h-9 flex items-center justify-center border border-white/20 hover:bg-primary hover:border-primary hover:-translate-y-0.5 transition-all"
                                 data-testid={`social-${i}`}
                             >

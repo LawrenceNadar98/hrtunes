@@ -3,6 +3,10 @@ import { useState } from "react";
 import { Camera, Save, Flame, Music2, Trophy } from "lucide-react";
 import { toast } from "sonner";
 
+const TIMEZONE_OPTIONS = ["Asia/Kolkata", "Asia/Dubai", "Europe/London", "America/New_York"];
+const INSTRUMENT_OPTIONS = ["Guitar", "Keyboard", "Both"];
+const LEVEL_OPTIONS = ["Beginner", "Intermediate", "Advanced"];
+
 export default function Profile() {
     const [form, setForm] = useState({
         name: "Aarav Mehta",
@@ -55,16 +59,16 @@ export default function Profile() {
                         <Field label="Email" value={form.email} onChange={(v) => update("email", v)} testId="profile-email" />
                         <Field label="Phone" value={form.phone} onChange={(v) => update("phone", v)} testId="profile-phone" />
                         <SelectField label="Timezone" value={form.timezone} onChange={(v) => update("timezone", v)}
-                            options={["Asia/Kolkata", "Asia/Dubai", "Europe/London", "America/New_York"]} />
+                            options={TIMEZONE_OPTIONS} />
                     </div>
 
                     <div className="divider-dashed" />
                     <div className="eyebrow">Musical preferences</div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <SelectField label="Primary instrument" value={form.instrument} onChange={(v) => update("instrument", v)}
-                            options={["Guitar", "Keyboard", "Both"]} />
+                            options={INSTRUMENT_OPTIONS} />
                         <SelectField label="Skill level" value={form.level} onChange={(v) => update("level", v)}
-                            options={["Beginner", "Intermediate", "Advanced"]} />
+                            options={LEVEL_OPTIONS} />
                     </div>
 
                     <div>
