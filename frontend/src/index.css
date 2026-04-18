@@ -2,74 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-    margin: 0;
-    font-family:
-        -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-        "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-        sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-code {
-    font-family:
-        source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
-}
-
 @layer base {
     :root {
-        --background: 0 0% 100%;
-        --foreground: 0 0% 3.9%;
-        --card: 0 0% 100%;
-        --card-foreground: 0 0% 3.9%;
-        --popover: 0 0% 100%;
-        --popover-foreground: 0 0% 3.9%;
-        --primary: 0 0% 9%;
-        --primary-foreground: 0 0% 98%;
-        --secondary: 0 0% 96.1%;
-        --secondary-foreground: 0 0% 9%;
-        --muted: 0 0% 96.1%;
-        --muted-foreground: 0 0% 45.1%;
-        --accent: 0 0% 96.1%;
-        --accent-foreground: 0 0% 9%;
-        --destructive: 0 84.2% 60.2%;
-        --destructive-foreground: 0 0% 98%;
-        --border: 0 0% 89.8%;
-        --input: 0 0% 89.8%;
-        --ring: 0 0% 3.9%;
-        --chart-1: 12 76% 61%;
-        --chart-2: 173 58% 39%;
-        --chart-3: 197 37% 24%;
-        --chart-4: 43 74% 66%;
-        --chart-5: 27 87% 67%;
-        --radius: 0.5rem;
-    }
-    .dark {
-        --background: 0 0% 3.9%;
+        --background: 0 0% 4%;
         --foreground: 0 0% 98%;
-        --card: 0 0% 3.9%;
+        --card: 0 0% 7%;
         --card-foreground: 0 0% 98%;
-        --popover: 0 0% 3.9%;
+        --popover: 0 0% 7%;
         --popover-foreground: 0 0% 98%;
-        --primary: 0 0% 98%;
-        --primary-foreground: 0 0% 9%;
-        --secondary: 0 0% 14.9%;
+        --primary: 357 93% 47%;
+        --primary-foreground: 0 0% 98%;
+        --secondary: 0 0% 15%;
         --secondary-foreground: 0 0% 98%;
-        --muted: 0 0% 14.9%;
-        --muted-foreground: 0 0% 63.9%;
-        --accent: 0 0% 14.9%;
+        --muted: 0 0% 12%;
+        --muted-foreground: 0 0% 65%;
+        --accent: 357 93% 47%;
         --accent-foreground: 0 0% 98%;
-        --destructive: 0 62.8% 30.6%;
+        --destructive: 0 100% 50%;
         --destructive-foreground: 0 0% 98%;
-        --border: 0 0% 14.9%;
-        --input: 0 0% 14.9%;
-        --ring: 0 0% 83.1%;
-        --chart-1: 220 70% 50%;
-        --chart-2: 160 60% 45%;
-        --chart-3: 30 80% 55%;
-        --chart-4: 280 65% 60%;
-        --chart-5: 340 75% 55%;
+        --border: 0 0% 15%;
+        --input: 0 0% 15%;
+        --ring: 357 93% 47%;
+        --chart-1: 357 93% 47%;
+        --chart-2: 0 0% 70%;
+        --chart-3: 0 0% 50%;
+        --chart-4: 30 90% 55%;
+        --chart-5: 200 80% 50%;
+        --radius: 0.25rem;
     }
 }
 
@@ -77,8 +36,85 @@ code {
     * {
         @apply border-border;
     }
+    html,
     body {
         @apply bg-background text-foreground;
+        font-family: "Satoshi", system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    ::selection {
+        background: hsl(357 93% 47%);
+        color: white;
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+    ::-webkit-scrollbar-track {
+        background: hsl(0 0% 6%);
+    }
+    ::-webkit-scrollbar-thumb {
+        background: hsl(0 0% 18%);
+        border-radius: 0;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: hsl(357 93% 47%);
+    }
+}
+
+@layer components {
+    .container-hr {
+        @apply max-w-7xl mx-auto px-6 lg:px-12;
+    }
+    .text-display {
+        font-family: "Bebas Neue", "Cabinet Grotesk", sans-serif;
+        letter-spacing: 0.01em;
+    }
+    .text-heading {
+        font-family: "Cabinet Grotesk", sans-serif;
+    }
+    .eyebrow {
+        @apply text-xs font-bold tracking-[0.3em] uppercase text-muted-foreground;
+        font-family: "JetBrains Mono", monospace;
+    }
+    .grain {
+        position: relative;
+    }
+    .grain::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+        opacity: 0.5;
+        mix-blend-mode: overlay;
+    }
+    .btn-primary {
+        @apply inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-6 py-3 font-bold uppercase tracking-wider text-sm transition-all hover:brightness-110 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed;
+        font-family: "Cabinet Grotesk", sans-serif;
+    }
+    .btn-outline {
+        @apply inline-flex items-center justify-center gap-2 border border-white/30 bg-transparent text-white px-6 py-3 font-bold uppercase tracking-wider text-sm transition-all hover:bg-white hover:text-black hover:-translate-y-0.5;
+        font-family: "Cabinet Grotesk", sans-serif;
+    }
+    .card-hr {
+        @apply bg-card border border-border transition-all hover:border-primary/60 hover:-translate-y-0.5;
+    }
+    .divider-dashed {
+        background-image: repeating-linear-gradient(
+            to right,
+            hsl(0 0% 25%) 0 6px,
+            transparent 6px 12px
+        );
+        height: 1px;
+    }
+    .noise-bg {
+        background-color: hsl(0 0% 4%);
+        background-image:
+            radial-gradient(circle at 20% 30%, hsl(357 93% 47% / 0.08), transparent 40%),
+            radial-gradient(circle at 80% 80%, hsl(0 0% 15% / 0.4), transparent 50%);
     }
 }
 
@@ -86,7 +122,6 @@ code {
     [data-debug-wrapper="true"] {
         display: contents !important;
     }
-
     [data-debug-wrapper="true"] > * {
         margin-left: inherit;
         margin-right: inherit;
