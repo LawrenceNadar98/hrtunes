@@ -1,0 +1,96 @@
+{
+  "theme": "dark",
+  "archetype": "Premium Gritty Editorial (Archetype 5 + 4)",
+  "design_philosophy": "A gritty, high-end music magazine aesthetic. Pure deep blacks, stark white typography, and vibrant signal red for accents. No soft gradients, no purple/teal. Use sharp contrasts and structural grids to build tension. The design should evoke the feeling of a live concert backstage or a premium music studio.",
+  "color_palette": {
+    "background": "hsl(0, 0%, 4%)",
+    "foreground": "hsl(0, 0%, 98%)",
+    "card": "hsl(0, 0%, 7%)",
+    "card_foreground": "hsl(0, 0%, 98%)",
+    "popover": "hsl(0, 0%, 7%)",
+    "popover_foreground": "hsl(0, 0%, 98%)",
+    "primary": "hsl(357, 93%, 47%)",
+    "primary_foreground": "hsl(0, 0%, 98%)",
+    "secondary": "hsl(0, 0%, 15%)",
+    "secondary_foreground": "hsl(0, 0%, 98%)",
+    "muted": "hsl(0, 0%, 12%)",
+    "muted_foreground": "hsl(0, 0%, 65%)",
+    "accent": "hsl(357, 93%, 47%)",
+    "accent_foreground": "hsl(0, 0%, 98%)",
+    "destructive": "hsl(0, 100%, 50%)",
+    "destructive_foreground": "hsl(0, 0%, 98%)",
+    "border": "hsl(0, 0%, 15%)",
+    "input": "hsl(0, 0%, 15%)",
+    "ring": "hsl(357, 93%, 47%)"
+  },
+  "typography": {
+    "primary_font": "Cabinet Grotesk",
+    "body_font": "Satoshi",
+    "hierarchy": {
+      "h1": "text-5xl sm:text-6xl md:text-7xl font-black tracking-tighter uppercase",
+      "h2": "text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight uppercase",
+      "h3": "text-xl sm:text-2xl font-bold tracking-tight",
+      "body": "text-base font-normal leading-relaxed text-muted-foreground",
+      "labels": "text-xs font-bold tracking-[0.2em] uppercase text-muted-foreground"
+    }
+  },
+  "layout_spacing": {
+    "philosophy": "Generous Spacing (p-8 to p-16) for marketing pages to let images breathe. Dense data bento grids for the dashboard and admin panel.",
+    "container": "max-w-7xl mx-auto px-6 lg:px-12",
+    "grid_modes": {
+      "marketing_bento": "grid-cols-1 md:grid-cols-12 gap-8. Create asymmetry by making hero span 8 cols and secondary items 4 cols.",
+      "dashboard_control_room": "grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6. Every pixel utilized, h-full on children."
+    }
+  },
+  "surface_strategies": {
+    "marketing_cards": "Flat background (bg-card), 1px subtle border (border-border), no shadow. On hover, subtle red border glow (border-primary/50) and slight lift (-translate-y-1).",
+    "dashboard_widgets": "Neumorphic clay & crisp variant: matching background, 1px border to ground it, high-contrast text.",
+    "header_nav": "Crystal Glass: backdrop-blur-2xl bg-background/60 border-b border-white/10. Sticky at top with z-50.",
+    "buttons": "Primary: Solid Red (bg-primary) with sharp edges (rounded-none or sm), text-white, hover:brightness-110. Secondary: Transparent with 1px white border, hover:bg-white hover:text-black transition-colors.",
+    "image_overlays": "Max overlay opacity bg-black/50. Prefer gradient overlays to maintain image visibility."
+  },
+  "components_usage": {
+    "icons": "Use Phosphor Icons (@phosphor-icons/react) for a premium, sharp duotone look.",
+    "video_player": "Custom stylized wrapper for YouTube embeds. Pure black background, 1px subtle border, red playback progress bar if possible.",
+    "tables": "Shadcn tables but with custom spacing. Dark rows, red active states for the admin panel student management.",
+    "forms_inputs": "Shadcn inputs heavily customized: dark background, white text, focus:ring-1 focus:ring-primary focus:border-primary. No generic blue rings."
+  },
+  "motion_animations": {
+    "hover_states": "Micro-interactions: interactive elements must clearly show hover (color shift, border highlight). Transition all 0.2s ease.",
+    "page_transitions": "Optional Framer Motion fade-in and slide-up (y: 20) for main content blocks to feel cinematic."
+  },
+  "media_urls": [
+    {
+      "category": "hero_background",
+      "url": "https://images.unsplash.com/photo-1761596896861-2a35624b9841?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNzl8MHwxfHNlYXJjaHw0fHxlbGVjdHJpYyUyMGd1aXRhciUyMGNsb3NlJTIwdXAlMjBkYXJrfGVufDB8fHx8MTc3NjUxNzA4M3ww&ixlib=rb-4.1.0&q=85",
+      "description": "Close-up of an electric guitar fretboard in dark lighting. Perfect for landing page hero."
+    },
+    {
+      "category": "course_thumbnail_guitar",
+      "url": "https://images.unsplash.com/photo-1763889784402-5e8744af31b2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODl8MHwxfHNlYXJjaHwzfHxwbGF5aW5nJTIwYWNvdXN0aWMlMjBndWl0YXIlMjBtb29keXxlbnwwfHx8fDE3NzY1MTcwODN8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Moody shot of playing acoustic guitar. Use for 'Guitar Class' course highlights."
+    },
+    {
+      "category": "course_thumbnail_keyboard",
+      "url": "https://images.unsplash.com/photo-1447876576829-25dd6c4b3d21?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzd8MHwxfHNlYXJjaHwxfHxoYW5kcyUyMHBsYXlpbmclMjBwaWFubyUyMGtleWJvYXJkJTIwZGFya3xlbnwwfHx8fDE3NzY1MTcwODN8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Hands playing piano in dark setting. Use for 'Keyboard coming soon' section."
+    },
+    {
+      "category": "instructor_portrait",
+      "url": "https://images.unsplash.com/photo-1762289350936-783284eb2f4a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjd8MHwxfHNlYXJjaHwxfHxtdXNpY2lhbiUyMHBvcnRyYWl0JTIwZGFyayUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzc2NTE3MTAyfDA&ixlib=rb-4.1.0&q=85",
+      "description": "Gritty portrait of a musician. Use for Instructor Profile section or testimonials."
+    }
+  ],
+  "testing_attributes": {
+    "rule": "All interactive elements MUST include data-testid. Example: data-testid='login-submit-button', data-testid='course-enroll-btn'."
+  },
+  "instructions_to_main_agent": [
+    "Load Cabinet Grotesk and Satoshi fonts via Fontshare CDN in public/index.html: <link href='https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@900,800,700,500,400&f[]=satoshi@900,700,500,400&display=swap' rel='stylesheet'>",
+    "Update tailwind.config.js with the provided color palette (HSL values) and font families.",
+    "Set dark mode as the default. Ensure the body uses the dark background and foreground colors.",
+    "Build the Landing Page with massive, asymmetrical, high-impact sections. Avoid the 'default SaaS' look.",
+    "Build the Dashboard using a dense, grid-based layout. Keep it highly functional with strict alignments.",
+    "Install and use @phosphor-icons/react. Do not use generic icons.",
+    "For the red accent (primary color), use it strategically for CTAs, active states, and to break the grid tension. DO NOT overuse it."
+  ]
+}
