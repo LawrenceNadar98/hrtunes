@@ -32,7 +32,7 @@ export const IMAGES = {
 // Gallery for landing page
 export const GALLERY = [
     "https://images.unsplash.com/photo-1525201548942-d8732f6617a0?auto=format&fit=crop&w=900&q=80",
-    "https://images.unsplash.com/photo-1519892338195-4f74b6c2ff6b?auto=format&fit=crop&w=900&q=80",
+    "https://images.unsplash.com/photo-1471478331149-c72f17e33c73?auto=format&fit=crop&w=900&q=80",
     "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&w=900&q=80",
     "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=900&q=80",
     "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=900&q=80",
@@ -144,7 +144,7 @@ export const COURSES = [
         rating: 0,
         price: 2499,
         thumbnail:
-            "https://images.unsplash.com/photo-1519892338195-4f74b6c2ff6b?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&w=1200&q=80",
         tags: ["Coming Soon", "Keyboard", "Beginner"],
         progress: 0,
         comingSoon: true,
