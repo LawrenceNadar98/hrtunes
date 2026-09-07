@@ -48,7 +48,7 @@ export default function SiteHeader() {
                     >
                         Log in
                     </Link>
-                    <Link to="/signup" className="btn-primary !py-2 !px-4 text-xs" data-testid="header-trial-btn">
+                    <Link to="/book-trial" className="btn-primary !py-2 !px-4 text-xs" data-testid="header-trial-btn">
                         Book Free Trial
                     </Link>
                 </div>
@@ -78,7 +78,7 @@ export default function SiteHeader() {
                         ))}
                         <div className="divider-dashed" />
                         <Link to="/login" className="text-sm" onClick={() => setOpen(false)}>Log in</Link>
-                        <Link to="/signup" className="btn-primary" onClick={() => setOpen(false)}>
+                        <Link to="/book-trial" className="btn-primary" onClick={() => setOpen(false)}>
                             Book Free Trial
                         </Link>
                     </div>

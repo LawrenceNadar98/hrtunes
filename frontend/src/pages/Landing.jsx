@@ -1,3 +1,4 @@
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
     ArrowRight,
@@ -14,15 +15,21 @@ import {
 } from "lucide-react";
 import SiteHeader from "@/components/layout/SiteHeader";
 import SiteFooter from "@/components/layout/SiteFooter";
+import { IMAGES } from "@/lib/images";
 import {
     BRAND,
-    IMAGES,
     GALLERY,
-    COURSES,
+    COURSES as DEFAULT_COURSES,
     INSTRUCTORS,
     TESTIMONIALS,
-    PRICING,
+    PRICING as DEFAULT_PRICING,
+    INSTRUMENTS as DEFAULT_INSTRUMENTS,
 } from "@/lib/mock";
+import { getPlans, getCourses, getInstruments } from "@/services/courseService";
+
+// TODO: re-enable when ready
+const SHOW_VIDEO_PREVIEW = false;
+const SHOW_TESTIMONIALS = false;
 
 export default function Landing() {
     return (
@@ -33,9 +40,9 @@ export default function Landing() {
             <Courses />
             <WhyUs />
             <Instructor />
-            <VideoPreview />
+            {SHOW_VIDEO_PREVIEW && <VideoPreview />}
             <Gallery />
-            <Testimonials />
+            {SHOW_TESTIMONIALS && <Testimonials />}
             <Pricing />
             <FinalCTA />
             <SiteFooter />
@@ -46,40 +53,45 @@ export default function Landing() {
 /* ---------------- HERO ---------------- */
 function Hero() {
     return (
-        <section className="relative overflow-hidden" data-testid="hero-section">
-            <div className="absolute inset-0 -z-10">
+        <section className="relative overflow-hidden bg-background" data-testid="hero-section">
+            <div className="absolute inset-0 -z-10 bg-black">
                 <img
                     src={IMAGES.heroGuitar}
-                    alt="Electric guitar"
-                    className="w-full h-full object-cover opacity-40"
+                    alt=""
+                    aria-hidden="true"
+                    className="absolute inset-y-0 right-0 h-full w-full md:w-[72%] scale-105 object-cover object-[65%_center] opacity-35 grayscale contrast-125"
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
+                <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/25" />
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/70" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_45%,rgba(239,0,18,0.18),transparent_34%)]" />
             </div>
 
-            <div className="container-hr pt-20 pb-28 md:pt-32 md:pb-40 grid grid-cols-1 md:grid-cols-12 gap-10 items-center relative">
-                <div className="md:col-span-8 animate-fade-up">
+            <div className="container-hr pt-20 pb-28 md:pt-32 md:pb-40 relative">
+                <div className="max-w-5xl animate-fade-up">
                     <div className="eyebrow mb-6 flex items-center gap-3">
                         <span className="w-8 h-px bg-primary" />
                         Live music school · Est. 2013
                     </div>
-                    <h1 className="text-display text-6xl sm:text-7xl md:text-8xl lg:text-9xl leading-[0.9] uppercase">
+                    <h1 className="text-display text-5xl sm:text-7xl md:text-8xl lg:text-9xl leading-[0.9] uppercase">
                         Turn passion <br />
-                        into{" "}
+                        into <br />
                         <span className="text-primary italic font-heading font-black">
                             performance
                         </span>
                         .
                     </h1>
+                    <p className="text-display mt-4 text-3xl sm:text-4xl leading-[0.9] uppercase text-white max-w-xl">
+                        Music is not just a hobby, it&apos;s your identity!
+                    </p>
                     <p className="mt-8 text-base md:text-lg text-white/70 max-w-xl leading-relaxed">
-                        Expert 1:1 training in Guitar & Keyboard — for absolute
+                        Expert 1:1 training in Guitar, Keyboard & Piano - for absolute
                         beginners, serious hobbyists, and aspiring pros. Learn
                         from touring musicians, jam with real humans, and play
                         your first full song in 14 days.
                     </p>
 
                     <div className="mt-10 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                        <Link to="/signup" className="btn-primary animate-pulse-red" data-testid="hero-cta-trial">
+                        <Link to="/book-trial" className="btn-primary animate-pulse-red" data-testid="hero-cta-trial">
                             Book a Free Trial Class
                             <ArrowRight size={16} />
                         </Link>
@@ -89,28 +101,10 @@ function Hero() {
                         </a>
                     </div>
 
-                    <div className="mt-16 grid grid-cols-3 max-w-md gap-6">
+                    <div className="mt-12 sm:mt-16 flex items-start gap-8 sm:gap-14">
                         <HeroStat value="2,300+" label="Students" />
                         <HeroStat value="12" label="Years" />
                         <HeroStat value="4.9★" label="Rating" />
-                    </div>
-                </div>
-
-                <div className="md:col-span-4 hidden md:block">
-                    <div className="relative aspect-[3/4] border border-white/10 overflow-hidden grain">
-                        <img
-                            src={IMAGES.instructor}
-                            alt="Instructor"
-                            className="w-full h-full object-cover"
-                        />
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-6">
-                            <div className="eyebrow mb-1 text-primary">Founder</div>
-                            <div className="text-heading font-bold text-xl">Harsh Rajput</div>
-                            <div className="text-sm text-white/70">Lead Guitar Instructor</div>
-                        </div>
-                        <div className="absolute top-4 right-4 bg-primary text-white text-[10px] font-bold px-2 py-1 uppercase tracking-widest">
-                            Live Teacher
-                        </div>
                     </div>
                 </div>
             </div>
@@ -120,9 +114,11 @@ function Hero() {
 
 function HeroStat({ value, label }) {
     return (
-        <div>
-            <div className="text-heading font-black text-3xl md:text-4xl leading-none">{value}</div>
-            <div className="eyebrow mt-2">{label}</div>
+        <div className="flex flex-col items-start gap-1">
+            <div className="text-heading font-black text-2xl leading-none tabular-nums sm:text-3xl md:text-4xl">
+                {value}
+            </div>
+            <div className="eyebrow !mt-0 whitespace-nowrap">{label}</div>
         </div>
     );
 }
@@ -154,8 +150,42 @@ function Marquee() {
     );
 }
 
-/* ---------------- COURSES ---------------- */
+/* ---------------- COURSES (PICK YOUR INSTRUMENT) ---------------- */
 function Courses() {
+    const [coursesList, setCoursesList] = useState(DEFAULT_COURSES);
+    const [instrumentsList, setInstrumentsList] = useState(DEFAULT_INSTRUMENTS);
+
+    useEffect(() => {
+        Promise.all([getCourses(), getInstruments()]).then(([cData, iData]) => {
+            if (cData && cData.length > 0) setCoursesList(cData);
+            if (iData && iData.length > 0) setInstrumentsList(iData);
+        });
+    }, []);
+
+    // Group courses by instrument and pick 1 featured course per instrument
+    const instrumentCards = useMemo(() => {
+        // Find all instruments from store or courses
+        const uniqueInstrumentNames = Array.from(
+            new Set([
+                ...instrumentsList.map((i) => i.name).filter(Boolean),
+                ...coursesList.map((c) => c.instrument).filter(Boolean)
+            ])
+        );
+
+        return uniqueInstrumentNames.map((instName) => {
+            const matchingCourses = coursesList.filter(
+                (c) => c.instrument?.toLowerCase() === instName.toLowerCase()
+            );
+            // Pick featured or first course
+            const featuredCourse = matchingCourses.find((c) => c.featured) || matchingCourses[0];
+            return {
+                instrumentName: instName,
+                totalCourses: matchingCourses.length,
+                course: featuredCourse
+            };
+        }).filter((item) => item.course); // only include if course exists
+    }, [coursesList, instrumentsList]);
+
     return (
         <section id="courses" className="container-hr py-24 md:py-32" data-testid="courses-section">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-14">
@@ -165,8 +195,8 @@ function Courses() {
                         Pick your <span className="text-primary">instrument</span>.
                     </h2>
                 </div>
-                <div className="md:col-span-6 md:col-start-7 flex items-end">
-                    <p className="text-white/70 leading-relaxed">
+                <div className="md:col-span-6 md:col-start-7 flex items-end justify-between">
+                    <p className="text-white/70 leading-relaxed max-w-lg text-sm md:text-base">
                         Hand-crafted curriculum. Live weekly feedback. Structured
                         modules that take you from your first chord to your first
                         stage.
@@ -174,79 +204,134 @@ function Courses() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-                {COURSES.slice(0, 2).map((c, idx) => (
-                    <CourseCard key={c.id} course={c} featured={idx === 0} />
+            {/* Instrument Cards Grid (1 representative course per instrument) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {instrumentCards.map(({ instrumentName, totalCourses, course }) => (
+                    <InstrumentPickCard
+                        key={instrumentName}
+                        instrumentName={instrumentName}
+                        totalCourses={totalCourses}
+                        course={course}
+                    />
                 ))}
-                <CourseCard course={COURSES[2]} featured={false} small />
+            </div>
+
+            {/* Bottom CTA to View All Courses Catalog */}
+            <div className="mt-12 text-center">
+                <Link
+                    to="/courses"
+                    className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-neutral-400 hover:text-white transition-colors bg-white/5 border border-white/10 hover:border-primary/50 px-6 py-3 rounded-full"
+                    data-testid="view-all-courses-btn"
+                >
+                    <Sparkles size={14} className="text-primary" /> View Complete Course Catalog ({coursesList.length} Courses) <ArrowRight size={14} />
+                </Link>
             </div>
         </section>
     );
 }
 
-function CourseCard({ course, featured, small }) {
-    const span = featured ? "md:col-span-7" : small ? "md:col-span-12" : "md:col-span-5";
+function InstrumentPickCard({ instrumentName, totalCourses, course }) {
+    const isComingSoon = Boolean(course.comingSoon);
+
     return (
         <article
-            className={`${span} card-hr group relative overflow-hidden`}
-            data-testid={`course-card-${course.id}`}
+            className="card-hr group relative overflow-hidden flex flex-col justify-between border-white/15 hover:border-primary/50 transition-all duration-300 shadow-2xl bg-card"
+            data-testid={`instrument-card-${instrumentName.toLowerCase()}`}
         >
-            <div className={`relative ${small ? "aspect-[4/1.2]" : "aspect-[16/10]"} overflow-hidden`}>
-                <img
-                    src={course.thumbnail}
-                    alt={course.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-                {course.comingSoon && (
-                    <div className="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold px-3 py-1 uppercase tracking-widest">
-                        Coming Soon
+            <div>
+                {/* Thumbnail Header */}
+                <div className="relative aspect-[16/9] overflow-hidden bg-black/80">
+                    <img
+                        src={course.thumbnail}
+                        alt={course.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+
+                    {isComingSoon && (
+                        <div className="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold px-3 py-1 uppercase tracking-widest rounded-sm">
+                            Coming Soon
+                        </div>
+                    )}
+
+                    <div className="absolute top-4 right-4 flex items-center gap-2 bg-black/80 backdrop-blur px-3 py-1.5 border border-white/20 rounded">
+                        {instrumentName.toLowerCase() === "guitar" ? (
+                            <Guitar size={14} className="text-primary" />
+                        ) : instrumentName.toLowerCase() === "keyboard" ? (
+                            <Piano size={14} className="text-primary" />
+                        ) : (
+                            <Sparkles size={14} className="text-primary" />
+                        )}
+                        <span className="text-xs font-bold uppercase tracking-widest text-white">
+                            {instrumentName}
+                        </span>
                     </div>
-                )}
-                <div className="absolute top-4 right-4 flex items-center gap-2 bg-black/70 backdrop-blur px-3 py-1 border border-white/20">
-                    {course.instrument === "Guitar" ? <Guitar size={13} /> : <Piano size={13} />}
-                    <span className="text-xs font-bold uppercase tracking-widest">
-                        {course.instrument}
-                    </span>
                 </div>
-            </div>
-            <div className="p-6 md:p-8">
-                <div className="flex flex-wrap gap-2 mb-4">
-                    {course.tags.map((t) => (
-                        <span
-                            key={t}
-                            className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 border border-white/20 text-white/80"
-                        >
-                            {t}
-                        </span>
-                    ))}
-                </div>
-                <h3 className="text-heading font-bold text-2xl md:text-3xl leading-tight">
-                    {course.title}
-                </h3>
-                <p className="mt-2 text-sm text-muted-foreground">{course.subtitle}</p>
-                <div className="mt-6 flex items-center justify-between">
-                    <div className="flex items-center gap-5 text-xs text-white/60">
-                        <span className="flex items-center gap-1.5">
-                            <Clock size={12} /> {course.duration}
-                        </span>
-                        <span className="flex items-center gap-1.5">
-                            <Users size={12} /> {course.students}
-                        </span>
-                        {course.rating > 0 && (
-                            <span className="flex items-center gap-1.5">
-                                <Star size={12} className="text-primary fill-primary" /> {course.rating}
+
+                {/* Content Details: EXACT design from Pic 1 */}
+                <div className="p-6 md:p-8 space-y-4">
+                    {/* Tags Box */}
+                    <div className="flex flex-wrap gap-2">
+                        {course.tags && course.tags.length > 0 ? (
+                            course.tags.map((t) => (
+                                <span
+                                    key={t}
+                                    className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 border border-white/20 text-white/90 bg-white/5 rounded-sm"
+                                >
+                                    {t}
+                                </span>
+                            ))
+                        ) : (
+                            <span className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 border border-white/20 text-white/90 bg-white/5 rounded-sm">
+                                {course.level || "BEGINNER"}
                             </span>
                         )}
                     </div>
-                    <Link
-                        to={course.comingSoon ? "/signup" : `/dashboard/courses/${course.id}`}
-                        className="inline-flex items-center gap-1 text-sm font-bold uppercase tracking-widest hover:text-primary transition-colors"
-                        data-testid={`course-explore-${course.id}`}
-                    >
-                        Explore <ArrowUpRight size={14} />
-                    </Link>
+
+                    {/* Title and Subtitle */}
+                    <div>
+                        <h3 className="text-display text-3xl md:text-4xl leading-tight font-black text-white group-hover:text-primary transition-colors">
+                            {course.title}
+                        </h3>
+                        <p className="mt-2 text-sm text-neutral-300 leading-relaxed font-normal">
+                            {course.subtitle || course.description}
+                        </p>
+                    </div>
+
+                    {/* Meta Row (Clock, Users, Star Rating) */}
+                    <div className="flex items-center gap-6 text-xs text-white/70 pt-2 border-t border-white/10 font-mono">
+                        <span className="flex items-center gap-1.5">
+                            <Clock size={13} className="text-primary" /> {course.duration || "8 weeks"}
+                        </span>
+                        <span className="flex items-center gap-1.5">
+                            <Users size={13} className="text-primary" /> {course.students || 0}
+                        </span>
+                        {(course.rating > 0 || !isComingSoon) && (
+                            <span className="flex items-center gap-1.5">
+                                <Star size={13} className="text-primary fill-primary" /> {course.rating || 4.9}
+                            </span>
+                        )}
+                    </div>
                 </div>
+            </div>
+
+            {/* Bottom Actions: Show More Details + Explore Instrument Courses */}
+            <div className="p-6 md:p-8 pt-0 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mt-4">
+                <Link
+                    to={isComingSoon ? "/signup" : `/dashboard/courses/${course.id}`}
+                    className="btn-outline !py-3 !px-4 text-xs font-bold uppercase tracking-wider text-center text-white hover:border-primary flex-1 justify-center"
+                    data-testid={`show-details-${course.id}`}
+                >
+                    Show More Details
+                </Link>
+
+                <Link
+                    to={`/courses?instrument=${encodeURIComponent(instrumentName)}`}
+                    className="btn-primary !py-3 !px-5 text-xs font-bold uppercase tracking-wider text-center flex items-center justify-center gap-1.5 shadow-lg shadow-red-950/40"
+                    data-testid={`explore-instrument-${instrumentName.toLowerCase()}`}
+                >
+                    Explore {instrumentName} Courses {totalCourses > 1 ? `(${totalCourses})` : ""} <ArrowRight size={13} />
+                </Link>
             </div>
         </article>
     );
@@ -257,23 +342,23 @@ function WhyUs() {
     const items = [
         {
             icon: Trophy,
-            title: "Performance-Oriented",
-            body: "Every student gets stage-ready through live practice, jam sessions, and recital opportunities.",
+            title: "Performance-Oriented Learning",
+            body: "Every student gets stage-ready through live practice, jam sessions, and confidence-building exercises.",
         },
         {
             icon: Users,
-            title: "Friendly Mentors",
-            body: "Our instructors are touring musicians who focus on individual growth, not scripted videos.",
+            title: "Customized Courses for All Levels",
+            body: "Our instructors are passionate musicians who focus on individual growth and personal attention.",
         },
         {
             icon: Sparkles,
-            title: "Custom Curriculum",
-            body: "From absolute beginners to intermediates — every lesson is tailored to match your pace and taste.",
+            title: "Personalized Roadmap & Feedback",
+            body: "From absolute beginners to aspiring professionals - we design lessons that match your pace and goals.",
         },
         {
             icon: Clock,
             title: "Learn From Anywhere",
-            body: "Offline at our studio or live 1:1 online. Same quality. No excuses. No missed weeks.",
+            body: "With both offline and live online classes, learning music has never been this easy and flexible.",
         },
     ];
     return (
@@ -286,8 +371,7 @@ function WhyUs() {
                         We <span className="text-primary">inspire</span> it.
                     </h2>
                     <p className="mt-6 text-white/70 max-w-md">
-                        Four reasons 2,300+ students chose HR Tunes over the
-                        endless YouTube rabbit-hole.
+                        Four reasons 2,300+ students chose HR Tunes.
                     </p>
                 </div>
                 <div className="md:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -295,7 +379,7 @@ function WhyUs() {
                         const Icon = item.icon;
                         return (
                             <div
-                                key={item.title}
+                                key={item.title + i}
                                 className="card-hr p-6 flex flex-col gap-3 group"
                                 data-testid={`why-card-${i}`}
                             >
@@ -474,6 +558,14 @@ function Testimonials() {
 
 /* ---------------- PRICING ---------------- */
 function Pricing() {
+    const [plans, setPlans] = useState(DEFAULT_PRICING);
+
+    useEffect(() => {
+        getPlans().then((data) => {
+            if (data && data.length > 0) setPlans(data);
+        });
+    }, []);
+
     return (
         <section id="pricing" className="bg-black border-y border-white/10 py-24 md:py-32" data-testid="pricing-section">
             <div className="container-hr">
@@ -488,7 +580,7 @@ function Pricing() {
                     </p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-                    {PRICING.map((p) => (
+                    {plans.map((p) => (
                         <div
                             key={p.id}
                             className={`relative flex flex-col p-8 transition-all hover:-translate-y-1 ${
@@ -512,7 +604,7 @@ function Pricing() {
                                 {p.price > 0 && <span className="text-sm opacity-70">{p.cadence}</span>}
                             </div>
                             <ul className="mt-8 space-y-3 flex-1">
-                                {p.features.map((f) => (
+                                {p.features?.map((f) => (
                                     <li key={f} className="flex items-start gap-2 text-sm">
                                         <Check size={15} className={p.featured ? "text-white" : "text-primary"} />
                                         <span className={p.featured ? "text-white/95" : "text-white/80"}>{f}</span>
@@ -520,7 +612,7 @@ function Pricing() {
                                 ))}
                             </ul>
                             <Link
-                                to={p.price === 0 ? "/signup" : "/checkout"}
+                                to={p.price === 0 ? "/book-trial" : `/plans/${p.id}`}
                                 className={`mt-8 text-center py-3 font-bold uppercase tracking-wider text-sm transition-all ${
                                     p.featured
                                         ? "bg-black text-white hover:bg-white hover:text-black"
@@ -528,7 +620,7 @@ function Pricing() {
                                 }`}
                                 data-testid={`pricing-cta-${p.id}`}
                             >
-                                {p.cta}
+                                {p.cta || (p.price === 0 ? "Book Free Trial" : "Choose Plan")}
                             </Link>
                         </div>
                     ))}
@@ -557,7 +649,7 @@ function FinalCTA() {
                         Book a free 60-minute trial. No credit card. Just you, an instrument, and someone who's actually listening.
                     </p>
                     <div className="mt-10 flex flex-col sm:flex-row gap-4">
-                        <Link to="/signup" className="btn-primary" data-testid="final-cta-trial">
+                        <Link to="/book-trial" className="btn-primary" data-testid="final-cta-trial">
                             Book Free Trial <ArrowRight size={16} />
                         </Link>
                         <a href={`tel:${BRAND.phone}`} className="btn-outline">

@@ -19,7 +19,7 @@ Design a modern, responsive UI for a full-stack music learning platform focused 
 
 ## User Personas
 1. **Student (Aarav Mehta)** — wants to learn guitar from beginner to intermediate
-2. **Instructor (Harsh Rajput)** — manages courses, live classes, students, earnings
+2. **Instructor (Harsh Patel)** — manages courses, live classes, students, earnings
 3. **Visitor** — lands on marketing page, browses courses, books free trial
 
 ## What's Implemented (Feb 18, 2026)
