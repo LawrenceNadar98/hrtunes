@@ -197,18 +197,24 @@ export default function Payments() {
                             <div className="p-4 border border-emerald-500/30 bg-emerald-500/5 rounded-lg space-y-3">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 bg-emerald-500/20 border border-emerald-500/40 rounded flex items-center justify-center font-bold text-emerald-400 text-xs">
-                                        UPI
+                                        {latestPayment?.gateway === "razorpay" ? "RZP" : "UPI"}
                                     </div>
                                     <div>
-                                        <div className="font-bold text-sm text-white">Direct UPI Transfer</div>
+                                        <div className="font-bold text-sm text-white">
+                                            {latestPayment?.gateway === "razorpay" ? "Razorpay Online Payment" : "Direct UPI Transfer"}
+                                        </div>
                                         <div className="text-xs text-emerald-400">Verified & Active</div>
                                     </div>
                                 </div>
-                                {latestPayment?.utrNumber && (
+                                {latestPayment?.razorpayPaymentId ? (
+                                    <div className="text-xs text-neutral-400 font-mono bg-black/40 p-2 rounded">
+                                        Payment ID: <span className="text-white font-bold">{latestPayment.razorpayPaymentId}</span>
+                                    </div>
+                                ) : latestPayment?.utrNumber ? (
                                     <div className="text-xs text-neutral-400 font-mono bg-black/40 p-2 rounded">
                                         UTR / Ref: <span className="text-white font-bold">{latestPayment.utrNumber}</span>
                                     </div>
-                                )}
+                                ) : null}
                             </div>
                         ) : (
                             <div className="p-4 border border-white/10 bg-white/5 rounded-lg space-y-2">
@@ -326,7 +332,12 @@ export default function Payments() {
                             >
                                 <div className="col-span-2 md:col-span-3 font-mono text-xs text-white">
                                     {p.id}
-                                    {p.utrNumber && <div className="text-[10px] text-neutral-400">UTR: {p.utrNumber}</div>}
+                                    {p.gateway === "razorpay" && p.razorpayPaymentId && (
+                                        <div className="text-[10px] text-sky-400 font-mono">RZP: {p.razorpayPaymentId}</div>
+                                    )}
+                                    {p.gateway !== "razorpay" && p.utrNumber && (
+                                        <div className="text-[10px] text-neutral-400 font-mono">UTR: {p.utrNumber}</div>
+                                    )}
                                 </div>
                                 <div className="col-span-2 md:col-span-3 text-xs text-muted-foreground flex items-center gap-2">
                                     <Calendar size={12} className="text-primary" />
@@ -449,12 +460,17 @@ export default function Payments() {
                                     <div className="text-neutral-400">Payment Status:</div>
                                     <div className="font-bold text-emerald-400 uppercase mt-0.5">VERIFIED & ACTIVE</div>
                                 </div>
-                                {selectedInvoice.utrNumber && (
+                                {selectedInvoice.razorpayPaymentId ? (
+                                    <div className="col-span-2">
+                                        <div className="text-neutral-400">Razorpay Payment ID:</div>
+                                        <div className="font-mono font-bold text-sky-400 mt-0.5">{selectedInvoice.razorpayPaymentId}</div>
+                                    </div>
+                                ) : selectedInvoice.utrNumber ? (
                                     <div className="col-span-2">
                                         <div className="text-neutral-400">UPI Transaction Ref (UTR):</div>
                                         <div className="font-mono font-bold text-primary mt-0.5">{selectedInvoice.utrNumber}</div>
                                     </div>
-                                )}
+                                ) : null}
                             </div>
 
                             <div className="border-t border-b border-white/10 py-3 space-y-2">

@@ -3,16 +3,34 @@ import { useState, useMemo, useEffect } from "react";
 import { ArrowLeft, Lock, CheckCircle2, Shield, QrCode, CreditCard, Landmark, Check, AlertCircle } from "lucide-react";
 import { PRICING as DEFAULT_PRICING } from "@/lib/mock";
 import { getPlans } from "@/services/courseService";
-import { createUpiPaymentSubmission } from "@/services/paymentService";
+import { 
+    createUpiPaymentSubmission,
+    createRazorpayOrder,
+    openRazorpayCheckoutModal,
+    fetchPaymentConfig
+} from "@/services/paymentService";
 import { createOrGetPendingEnrollment } from "@/services/enrollmentService";
 import { useAuth } from "@/context/AuthContext";
 import UpiQrCode from "@/components/ui/UpiQrCode";
 import { toast } from "sonner";
 
 const PAYMENT_METHODS = [
-    { id: "upi", label: "UPI (Direct QR & UTR)", icon: QrCode, enabled: true, recommended: true },
-    { id: "card", label: "Credit / Debit Card", icon: CreditCard, enabled: false, badge: "Coming Soon" },
-    { id: "netbanking", label: "Net Banking", icon: Landmark, enabled: false, badge: "Coming Soon" },
+    { 
+        id: "razorpay", 
+        label: "Razorpay (Cards, UPI, NetBanking)", 
+        icon: CreditCard, 
+        enabled: true, 
+        recommended: true,
+        badge: "Instant Activation"
+    },
+    { 
+        id: "upi", 
+        label: "Manual UPI (QR Scan & UTR)", 
+        icon: QrCode, 
+        enabled: true, 
+        recommended: false,
+        badge: "Manual Verification"
+    },
 ];
 
 export default function Checkout() {
@@ -44,8 +62,17 @@ export default function Checkout() {
         });
     }, [initialPlanId]);
 
-    const [method, setMethod] = useState("upi");
+    const [method, setMethod] = useState("razorpay");
     const [processing, setProcessing] = useState(false);
+
+    useEffect(() => {
+        fetchPaymentConfig().then((cfg) => {
+            if (cfg && cfg.razorpay_enabled === false) {
+                // If backend indicates Razorpay keys are not yet configured, smoothly default to manual UPI
+                setMethod("upi");
+            }
+        });
+    }, []);
 
     // Form inputs
     const [formData, setFormData] = useState({
@@ -79,13 +106,6 @@ export default function Checkout() {
     const onSubmit = async (e) => {
         e.preventDefault();
 
-        if (method === "upi") {
-            if (!formData.utrNumber || formData.utrNumber.trim().length < 6) {
-                toast.error("Please enter a valid 12-digit UPI Transaction / UTR reference number.");
-                return;
-            }
-        }
-
         // Check if user is logged in
         if (!user) {
             toast.info("Please log in or create an account to link your payment & enrollment.");
@@ -95,42 +115,90 @@ export default function Checkout() {
 
         setProcessing(true);
 
-        try {
-            // Ensure pending enrollment exists
-            let enrId = activeEnrollmentId;
-            if (!enrId) {
-                const enrollment = await createOrGetPendingEnrollment({
-                    userId: user.id || user.uid,
-                    userName: formData.name || user.name,
-                    userEmail: formData.email || user.email,
+        // OPTION A: RAZORPAY ONLINE CHECKOUT
+        if (method === "razorpay") {
+            try {
+                // Request authoritative order from trusted backend
+                const orderData = await createRazorpayOrder({
                     planId: selected.id,
-                    planName: selected.name,
-                    planPrice: selected.price,
-                    termsVersion: "v1.2-2026"
+                    userId: user.id || user.uid,
+                    userName: formData.name || user.name || "Student",
+                    userEmail: formData.email || user.email,
+                    phone: formData.phone || user.phone || ""
                 });
-                enrId = enrollment.id;
-                setActiveEnrollmentId(enrId);
+
+                // Open Razorpay Standard Checkout Modal
+                openRazorpayCheckoutModal({
+                    orderData,
+                    user,
+                    planName: selected.name,
+                    onSuccess: () => {
+                        toast.success("Payment verified! Your course enrollment is now active.");
+                        setProcessing(false);
+                        navigate("/dashboard");
+                    },
+                    onFailure: (err) => {
+                        console.error("Razorpay error:", err);
+                        toast.error(err.message || "Payment verification failed. Please try again or use manual UPI.");
+                        setProcessing(false);
+                    },
+                    onDismiss: () => {
+                        toast.info("Checkout dismissed. You can complete payment at any time.");
+                        setProcessing(false);
+                    }
+                });
+            } catch (err) {
+                console.error("Failed to initiate Razorpay checkout:", err);
+                toast.error(err.message || "Unable to initiate Razorpay order. Falling back to manual UPI.");
+                setProcessing(false);
+            }
+            return;
+        }
+
+        // OPTION B: MANUAL UPI PROOF SUBMISSION (EXISTING WORKFLOW)
+        if (method === "upi") {
+            if (!formData.utrNumber || formData.utrNumber.trim().length < 6) {
+                toast.error("Please enter a valid 12-digit UPI Transaction / UTR reference number.");
+                setProcessing(false);
+                return;
             }
 
-            const payment = await createUpiPaymentSubmission({
-                userId: user.id || user.uid,
-                enrollmentId: enrId,
-                planId: selected.id,
-                planName: selected.name,
-                amount: totalAmount,
-                studentName: formData.name,
-                email: formData.email,
-                phone: formData.phone,
-                utrNumber: formData.utrNumber || `CARD-${Date.now().toString().slice(-8)}`,
-                notes: formData.notes
-            });
+            try {
+                let enrId = activeEnrollmentId;
+                if (!enrId) {
+                    const enrollment = await createOrGetPendingEnrollment({
+                        userId: user.id || user.uid,
+                        userName: formData.name || user.name,
+                        userEmail: formData.email || user.email,
+                        planId: selected.id,
+                        planName: selected.name,
+                        planPrice: selected.price,
+                        termsVersion: "v1.2-2026"
+                    });
+                    enrId = enrollment.id;
+                    setActiveEnrollmentId(enrId);
+                }
 
-            toast.success("Payment details submitted successfully! Verification in progress.");
-            navigate(`/payment-status/${payment.id}`);
-        } catch (err) {
-            console.error("Payment submission failed:", err);
-            toast.error("Failed to submit payment proof. Please try again.");
-            setProcessing(false);
+                const payment = await createUpiPaymentSubmission({
+                    userId: user.id || user.uid,
+                    enrollmentId: enrId,
+                    planId: selected.id,
+                    planName: selected.name,
+                    amount: totalAmount,
+                    studentName: formData.name,
+                    email: formData.email,
+                    phone: formData.phone,
+                    utrNumber: formData.utrNumber.trim(),
+                    notes: formData.notes
+                });
+
+                toast.success("Payment details submitted successfully! Verification in progress.");
+                navigate(`/payment-status/${payment.id}`);
+            } catch (err) {
+                console.error("Payment submission failed:", err);
+                toast.error("Failed to submit payment proof. Please try again.");
+                setProcessing(false);
+            }
         }
     };
 
@@ -246,6 +314,22 @@ export default function Checkout() {
                                 })}
                             </div>
 
+                            {method === "razorpay" && (
+                                <div className="p-6 bg-card/60 border border-primary/30 rounded-xl space-y-4 shadow-xl">
+                                    <div className="flex items-center gap-2 text-primary font-bold text-sm">
+                                        <Lock className="w-4 h-4" />
+                                        <span>Instant Razorpay Payment (Cards, UPI, NetBanking)</span>
+                                    </div>
+                                    <p className="text-xs text-neutral-300 leading-relaxed">
+                                        Clicking the button below will open the official Razorpay Checkout popup. You can complete payment using any Indian Debit/Credit Card, UPI app (GPay, PhonePe, Paytm), NetBanking, or Wallets.
+                                    </p>
+                                    <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3.5 py-2 rounded">
+                                        <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+                                        <span>Course curriculum and student portal unlock immediately upon verified completion.</span>
+                                    </div>
+                                </div>
+                            )}
+
                             {method === "upi" && (
                                 <div className="space-y-6">
                                     <UpiQrCode
@@ -334,7 +418,11 @@ export default function Checkout() {
                             className="btn-primary w-full !py-4 flex items-center justify-center gap-2 font-display text-xl tracking-wider uppercase shadow-xl shadow-red-600/30 cursor-pointer"
                             data-testid="pay-btn"
                         >
-                            {processing ? "Submitting Payment Proof..." : `Submit Payment & Verify (₹${totalAmount.toLocaleString("en-IN")})`}
+                            {processing
+                                ? (method === "razorpay" ? "Opening Secure Checkout..." : "Submitting Payment Proof...")
+                                : (method === "razorpay"
+                                    ? `Pay with Razorpay · ₹${totalAmount.toLocaleString("en-IN")}`
+                                    : `Submit Payment & Verify · ₹${totalAmount.toLocaleString("en-IN")}`)}
                         </button>
                     </form>
 

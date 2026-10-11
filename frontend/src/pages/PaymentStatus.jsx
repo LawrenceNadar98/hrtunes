@@ -158,8 +158,12 @@ export default function PaymentStatus() {
                                 <p className="text-sm font-semibold text-white">{payment.email} • {payment.phone}</p>
                             </div>
                             <div className="p-4 bg-neutral-900/60 rounded-xl border border-neutral-800/80">
-                                <span className="text-[11px] font-mono text-neutral-400 uppercase block mb-1">Submitted UPI UTR</span>
-                                <p className="text-sm font-mono font-bold text-red-400 tracking-wider">{payment.utrNumber}</p>
+                                <span className="text-[11px] font-mono text-neutral-400 uppercase block mb-1">
+                                    {payment.gateway === "razorpay" ? "Razorpay Payment ID" : "Submitted UPI UTR"}
+                                </span>
+                                <p className="text-sm font-mono font-bold text-red-400 tracking-wider">
+                                    {payment.razorpayPaymentId || payment.utrNumber || "Verified Online"}
+                                </p>
                             </div>
                             <div className="p-4 bg-neutral-900/60 rounded-xl border border-neutral-800/80">
                                 <span className="text-[11px] font-mono text-neutral-400 uppercase block mb-1">Submission Time</span>

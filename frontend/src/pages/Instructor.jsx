@@ -164,6 +164,7 @@ function UpiPaymentsAdmin({ payments, loading, onRefresh }) {
             p.studentName?.toLowerCase().includes(search.toLowerCase()) ||
             p.email?.toLowerCase().includes(search.toLowerCase()) ||
             p.utrNumber?.toLowerCase().includes(search.toLowerCase()) ||
+            p.razorpayPaymentId?.toLowerCase().includes(search.toLowerCase()) ||
             p.phone?.toLowerCase().includes(search.toLowerCase());
         return matchesFilter && matchesSearch;
     });
@@ -278,11 +279,17 @@ function UpiPaymentsAdmin({ payments, loading, onRefresh }) {
                                                 <div className="font-mono font-bold text-sm text-primary">₹{p.amount}</div>
                                             </td>
 
-                                            {/* UTR */}
+                                            {/* UTR / Reference */}
                                             <td className="p-4">
-                                                <span className="font-mono font-bold text-amber-400 bg-amber-400/10 px-2 py-1 rounded border border-amber-400/20 text-xs tracking-wider">
-                                                    {p.utrNumber}
-                                                </span>
+                                                {p.gateway === "razorpay" ? (
+                                                    <span className="font-mono font-bold text-sky-400 bg-sky-400/10 px-2 py-1 rounded border border-sky-400/20 text-xs tracking-wider">
+                                                        RZP: {p.razorpayPaymentId || "Auto"}
+                                                    </span>
+                                                ) : (
+                                                    <span className="font-mono font-bold text-amber-400 bg-amber-400/10 px-2 py-1 rounded border border-amber-400/20 text-xs tracking-wider">
+                                                        {p.utrNumber || "UPI"}
+                                                    </span>
+                                                )}
                                                 <div className="text-[10px] text-neutral-500 mt-1 font-mono">{p.id}</div>
                                             </td>
 
